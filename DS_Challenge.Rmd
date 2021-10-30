@@ -1,0 +1,68 @@
+---
+title: "Shopify_Challenge"
+author: "Ankita Sarkar"
+date: "10/30/2021"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Reading the data set:
+```{r}
+file <- read.csv('Sheet1.csv')
+```
+
+Creating a data frame to work with it
+```{r}
+df <- data.frame(file)
+```
+
+Getting the summary of the data
+```{r}
+summary(df$order_amount)
+```
+Clearly the maximum order_amount for the sneakers is way too long. This is the reason we have got higher average value i.e. $3145. While the minimum order_amount is 90.
+
+Plotting a boxplot for the data
+```{r}
+library(ggplot2)
+
+ggplot(data = df) + 
+  aes(x = '', y = order_amount) +
+  geom_boxplot(outlier.colour = 'red', outlier.size = 1, colour = 'green') +
+  coord_cartesian(ylim = c(-50, 2000))
+```
+ 
+We have plotted the order_amount with a box plot (in green). The y axis is set between -50 and 2000. The outliers present in the dataset are shown in red. The median is at 284, first quantile is at 163 and the third quantile is at 390. 
+
+Printing out outlier values
+```{r}
+out <- boxplot.stats(df$order_amount)$out
+out
+```
+
+Printing out the indexes containing outliers
+```{r}
+
+out_ind <- which(df$order_amount %in% c(out))
+out_ind
+```
+
+There are no specific way to handle outliers in data. We should not really ignore outliers which is quite common in real life dataset. One approach we can take to handle the outlier problem in the present dataset is to replace them with the value of median. As median does not get affected with the presence of outliers unlike mean. 
+
+We see the median for order_amount is 284. So we would change all the rows holding excessive large amount with this median and process again.
+
+```{r}
+df[out_ind, ] <- median(df$order_amount)
+
+```
+If we check the summary of the data now, it seems to solve our problem. The minimum as is at 90 and maximum at 730 while we get the mean at 293.4.
+
+```{r}
+summary(df$order_amount)
+```
+
